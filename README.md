@@ -1,4 +1,18 @@
-# scapy for python3 (aka scapy3k) 
+# Scapy bluetooth for python3
+
+1. zadig.exe changes dongles to libusb-win32
+
+2. List the supported bluetooth adapters
+```
+listdev.py
+```
+
+3. 
+
+
+
+
+## scapy for python3 (aka scapy3k)
 
 [Follow @scapy3k](https://twitter.com/scapy3k) and/or see [scapy3k news and examples](https://phaethon.github.io/scapy) for recent news. [Original scapy documentation updated for scapy3k](http://phaethon.github.io/scapy/api/index.html)
 
@@ -11,7 +25,7 @@ Please, submit all issues https://github.com/phaethon/scapy preferrably with .pc
 ## News
 [Follow @scapy3k](https://twitter.com/scapy3k) and/or see [scapy3k](https://phaethon.github.io/scapy) for recent news.
 
-Scapy3k is included in the [Network Security Toolkit](http://www.networksecuritytoolkit.org/nst/index.html) Release 22. 
+Scapy3k is included in the [Network Security Toolkit](http://www.networksecuritytoolkit.org/nst/index.html) Release 22.
 
 Classic scapy has been trying to catch up with the improvements in scapy3k. These features were first implemented in scapy3k and some of them might have been reimplemented in scapy or not:
 * replaced PyCrypto with cryptography.io (thanks to @ThomasFaivre)
@@ -23,6 +37,7 @@ Classic scapy has been trying to catch up with the improvements in scapy3k. Thes
 * some bugs fixed, which are still present in original scapy
 
 ## Installation
+
 
 Install with 'python3 setup.py install' from source tree (get it with `git clone https://github.com/phaethon/scapy.git`) or `pip3 install scapy-python3` for latest published version.
 

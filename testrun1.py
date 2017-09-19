@@ -12,8 +12,8 @@ print("take {} seconds".format( int(t2-t1) ))
 
 from scapy.layers.usbhci import *
 a = find_bt_adapters()
-p1 = PyUSBBluetoothHCISocket(a[0])
 
+p1 = PyUSBBluetoothHCISocket(a[0])
 
 p2 = HCI_Hdr() / HCI_Command_Hdr() / HCI_Cmd_Reset()
 p2.do_build()

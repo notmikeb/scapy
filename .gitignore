@@ -7,3 +7,4 @@ __pycache__
 scapy_python3.egg-info
 .idea
 *.swp
+*.tag*
