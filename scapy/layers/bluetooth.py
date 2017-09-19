@@ -61,7 +61,7 @@ class HCI_Hdr(Packet):
 
     def mysummary(self):
         return self.sprintf("HCI %type%")
-        
+
 ## HCI Command
 class HCI_Inquiry(Packet):
     name = "HCI Inquiry"
@@ -71,7 +71,12 @@ class HCI_Inquiry(Packet):
     ByteField("nap_3",0x9e),
     ByteField("inq_length",6),
     ByteField("num_rsp",0)
-    
+    ]
+
+class HCI_Write_Inquiry_Mode(Packet):
+    name = "HCI_Write_Inquiry_Mode"
+    fields_desc = [
+    ByteField("inquiry_mode",0)
     ]
 
 class HCI_Write_Scan_Enable(Packet):
@@ -80,7 +85,36 @@ class HCI_Write_Scan_Enable(Packet):
     ByteField("enable",0)
     ]
 
-    
+class HCI_Remote_Name_Request(Packet):
+    name = "HCI Remote Name Request"
+    fields_desc = [
+    LEMACField("address", None),
+    ByteField("page_scan_repetition_mode",0),
+    ByteField("reserved",0),
+    LEShortField("clock_offset",0)
+    ]
+
+class HCI_Remote_Name_Request_Cancel(Packet):
+    name = "HCI Remote Name Request Cancel"
+    fields_desc = [
+    LEMACField("address", None),
+    ]
+
+class HCI_Read_Remote_Supported_Features(Packet):
+    name = "HCI Remote Suported Features"
+    fields_desc = [
+        ByteField("handle",0), # Actually, handle is 12 bits and flags is 4.
+        ByteField("flags",0),  # I wait to write a LEBitField
+    ]
+
+class HCI_Read_Remote_Extended_Features(Packet) :
+    name = "HCI Remote Extended Features"
+    fields_desc = [
+        ByteField("handle",0), # Actually, handle is 12 bits and flags is 4.
+        ByteField("flags",0),  # I wait to write a LEBitField
+        ByteField("page_number",0),
+    ]
+
 class HCI_ACL_Hdr(Packet):
     name = "HCI ACL header"
     fields_desc = [ ByteField("handle",0), # Actually, handle is 12 bits and flags is 4.
@@ -99,7 +133,7 @@ class L2CAP_Hdr(Packet):
     name = "L2CAP header"
     fields_desc = [ LEShortField("len",None),
                     LEShortEnumField("cid",0,{1:"control"}),]
-    
+
     def post_build(self, p, pay):
         p += pay
         if self.len is None:
@@ -204,7 +238,7 @@ class L2CAP_InfoResp(Packet):
     def answers(self, other):
         return self.type == other.type
 
-    
+
 class L2CAP_Connection_Parameter_Update_Request(Packet):
     name = "L2CAP Connection Parameter Update Request"
     fields_desc = [ LEShortField("min_interval", 0),
@@ -212,7 +246,7 @@ class L2CAP_Connection_Parameter_Update_Request(Packet):
                     LEShortField("slave_latency", 0),
                     LEShortField("timeout_mult", 0), ]
 
-    
+
 class L2CAP_Connection_Parameter_Update_Response(Packet):
     name = "L2CAP Connection Parameter Update Response"
     fields_desc = [ LEShortField("move_result", 0), ]
@@ -360,7 +394,7 @@ class SM_Master_Identification(Packet):
     name = "Master Identification"
     fields_desc = [ XLEShortField("ediv", 0),
                     StrFixedLenField("rand", '\x00' * 8, 8), ]
-    
+
 class SM_Identity_Information(Packet):
     name = "Identity Information"
     fields_desc = [ StrFixedLenField("irk", '\x00' * 16, 16), ]
@@ -369,7 +403,7 @@ class SM_Identity_Address_Information(Packet):
     name = "Identity Address Information"
     fields_desc = [ ByteEnumField("atype", 0, {0:"public"}),
                     LEMACField("address", None), ]
-    
+
 class SM_Signing_Information(Packet):
     name = "Signing Information"
     fields_desc = [ StrFixedLenField("csrk", '\x00' * 16, 16), ]
@@ -545,7 +579,7 @@ class HCI_Cmd_LE_Create_Connection(Packet):
                     LEShortField("timeout", 42),
                     LEShortField("min_ce", 0),
                     LEShortField("max_ce", 0), ]
-    
+
 class HCI_Cmd_LE_Connection_Update(Packet):
     name = "LE Connection Update"
     fields_desc = [ LEShortField("conn_handle", 64),
@@ -720,6 +754,11 @@ bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Set_Scan_Parameters, opcode=0x200b)
 bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Set_Scan_Enable, opcode=0x200c)
 
 bind_layers( HCI_Command_Hdr, HCI_Inquiry, opcode=0x0401)
+bind_layers( HCI_Command_Hdr, HCI_Remote_Name_Request, opcode=0x0419)
+bind_layers( HCI_Command_Hdr, HCI_Remote_Name_Request_Cancel, opcode=0x041A)
+bind_layers( HCI_Command_Hdr, HCI_Read_Remote_Supported_Features, opcode=0x041B)
+bind_layers( HCI_Command_Hdr, HCI_Read_Remote_Extended_Features, opcode=0x041C)
+bind_layers( HCI_Command_Hdr, HCI_Write_Inquiry_Mode, opcode=0x0c45)
 bind_layers( HCI_Command_Hdr, HCI_Cmd_Disconnect, opcode=0x406)
 
 bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Create_Connection, opcode=0x200d)
