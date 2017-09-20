@@ -91,6 +91,14 @@ p1.send(HCI_Hdr()/HCI_Command_Hdr()/ HCI_Inquiry())
 b = p1.recv()
 showevent(b)
 
+p1.send(HCI_Hdr()/HCI_Command_Hdr()/HCI_Create_Connection(bd_addr="80:a5:89:12:fd:92"))
+b = p1.recv()
+showevent(b)
+
+p1.sendcmd(HCI_Create_Connection(bd_addr="F4:31:C3:53:D0:AB"))
+b = p1.recv()
+showevent(b)
+
 # iphone "F4:31:C3:53:D0:AB"
 # modify scapy.layers.bluetooth
 import imp

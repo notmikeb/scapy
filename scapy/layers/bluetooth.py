@@ -114,7 +114,56 @@ class HCI_Read_Remote_Extended_Features(Packet) :
         ByteField("flags",0),  # I wait to write a LEBitField
         ByteField("page_number",0),
     ]
-
+    
+# HCI_Create_Connection 0x0005    
+class HCI_Create_Connection(Packet):
+    name = "HCI_Create_Connection"
+    fields_desc = [
+    LEMACField("bd_addr", None),
+    LEShortField("packet_type",0xcc18),
+    ByteField("page_scan_repetition_mode",1),
+    ByteField("reserved",0),
+    LEShortField("clock_offset",0),
+    ByteField("allow_role_switch",1),
+    ]
+# HCI_Disconnect 0x0006
+class HCI_Disconnect(Packet):
+    name = "HCI_Disconnect"
+    fields_desc = [
+    ByteField("handle",0), # Actually, handle is 12 bits and flags is 4.
+    ByteField("flags",0),  # I wait to write a LEBitField    
+    ByteField("reason",0),
+    ]    
+# HCI_Create_Connection_Cancel 0x008
+class HCI_Create_Connection_Cancel(Packet):
+    name = "HCI_Create_Connection_Cancel"
+    fields_desc = [
+    LEMACField("bd_addr", None),
+    ]    
+# HCI_Accept_Connection_Request 0x0009
+class HCI_Accept_Connection_Request(Packet):
+    name = "HCI_Accept_Connection_Request"
+    fields_desc = [
+    LEMACField("bd_addr", None),
+    ByteField("role",0),
+    ]    
+# HCI_Reject_Connection_Request 0x000a
+class HCI_Reject_Connection_Request(Packet):
+    name = "HCI_Reject_Connection_Request"
+    fields_desc = [
+    LEMACField("bd_addr", None),
+    ByteField("role",0),
+    ]
+    
+# HCI_Event_Role_Change, 0x12, page 1127
+class HCI_Event_Role_Change(Packet):
+    name = "HCI_Event_Role_Change"
+    fields_desc = [
+    ByteEnumField("status", 0, {0:"success"}),
+    LEMACField("bd_addr", None),
+    ByteField("role",0),
+    ]
+    
 class HCI_ACL_Hdr(Packet):
     name = "HCI ACL header"
     fields_desc = [ ByteField("handle",0), # Actually, handle is 12 bits and flags is 4.
@@ -651,6 +700,47 @@ class HCI_Event_Hdr(Packet):
     fields_desc = [ XByteField("code", 0),
                     ByteField("length", 0), ]
 
+# Inquiry Complete, 0x01 , page=1104
+class HCI_Event_Inquiry_Complete(Packet):
+    name = "Inquiry Complete"
+    fields_desc = [ ByteEnumField("status", 0, {0:"success"}),
+                     ]
+
+# Inquiry Result, 0x02, #todo
+class HCI_Event_Inquiry_Result(Packet):
+    name = "Inquiry Result"
+    fields_desc = [ ByteEnumField("num_responses", 0, {0:"success"}),
+                    LEMACField("bd_addr", None),
+                    ByteField("page_scan_repetition_mode", 0),
+                    ByteField("reserved1", 0),
+                    ByteField("reserved2", 0),
+                    ByteField("cod1", 0),
+                    ByteField("cod2", 0),
+                    ByteField("cod3", 0),
+                    LEShortField("clock_offset",0),
+                     ]
+
+# Connection Complete, 0x03
+class HCI_Event_Connection_Complete(Packet):
+    name = "Connection Complete"
+    fields_desc = [ ByteEnumField("status", 0, {0:"success"}),
+                    LEShortField("handle", 0),
+                    LEMACField("bd_addr", None),
+                    ByteField("link_type", 0),
+                    ByteField("encryption_enabled", 0),
+                     ]
+
+# Connection Request Event, 0x04
+class HCI_Event_Connection_Request_Event(Packet):
+    name = "Connection Request Event"
+    fields_desc = [ 
+                    LEMACField("bd_addr", None),
+                    ByteField("cod1", 0),
+                    ByteField("cod2", 0),
+                    ByteField("cod3", 0),
+                    ByteField("link_type", 0),
+                     ]
+
 
 class HCI_Event_Disconnection_Complete(Packet):
     name = "Disconnection Complete"
@@ -754,6 +844,12 @@ bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Set_Scan_Parameters, opcode=0x200b)
 bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Set_Scan_Enable, opcode=0x200c)
 
 bind_layers( HCI_Command_Hdr, HCI_Inquiry, opcode=0x0401)
+bind_layers( HCI_Command_Hdr, HCI_Create_Connection, opcode=0x0405)
+bind_layers( HCI_Command_Hdr, HCI_Disconnect, opcode=0x0406)
+bind_layers( HCI_Command_Hdr, HCI_Create_Connection_Cancel, opcode=0x0408)
+bind_layers( HCI_Command_Hdr, HCI_Accept_Connection_Request, opcode=0x0409)
+bind_layers( HCI_Command_Hdr, HCI_Reject_Connection_Request, opcode=0x040a)
+
 bind_layers( HCI_Command_Hdr, HCI_Remote_Name_Request, opcode=0x0419)
 bind_layers( HCI_Command_Hdr, HCI_Remote_Name_Request_Cancel, opcode=0x041A)
 bind_layers( HCI_Command_Hdr, HCI_Read_Remote_Supported_Features, opcode=0x041B)
@@ -765,12 +861,16 @@ bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Create_Connection, opcode=0x200d)
 bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Create_Connection_Cancel, opcode=0x200e)
 bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Connection_Update, opcode=0x2013)
 
-
 bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Start_Encryption_Request, opcode=0x2019)
 
 bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Long_Term_Key_Request_Reply, opcode=0x201a)
 bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Long_Term_Key_Request_Negative_Reply, opcode=0x201b)
 
+bind_layers( HCI_Event_Hdr, HCI_Event_Inquiry_Complete, code=0x1)
+bind_layers( HCI_Event_Hdr, HCI_Event_Inquiry_Result, code=0x2)
+bind_layers( HCI_Event_Hdr, HCI_Event_Connection_Complete, code=0x3)
+bind_layers( HCI_Event_Hdr, HCI_Event_Connection_Request_Event, code=0x4)
+bind_layers( HCI_Event_Hdr, HCI_Event_Role_Change, code = 0x12)
 bind_layers( HCI_Event_Hdr, HCI_Event_Disconnection_Complete, code=0x5)
 bind_layers( HCI_Event_Hdr, HCI_Event_Encryption_Change, code=0x8)
 bind_layers( HCI_Event_Hdr, HCI_Event_Command_Complete, code=0xe)

@@ -113,6 +113,8 @@ class PyUSBBluetoothHCISocket(SuperSocket):
         if sent_len != l:
             raise PyUSBBluetoothUserSocketException(
                 "Send failure. Sent %u instead of %u bytes" % (sent_len, l))
+    def sendcmd(self, scapy_packet):
+        self.send(HCI_Hdr()/HCI_Command_Hdr()/scapy_packet)
 
 
 
