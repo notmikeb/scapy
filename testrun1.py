@@ -18,7 +18,9 @@ a = find_bt_adapters()
 p1 = PyUSBBluetoothHCISocket(a[0])
 
 def showevent(b):
+  if b != None:
     print(b.summary())
+    print( repr(b) )
     try:
         print (hex(b.opcode))
     except:
@@ -68,10 +70,6 @@ p1.send(HCI_Hdr()/HCI_Command_Hdr()/HCI_Cmd_LE_Set_Scan_Enable(
 b = p1.recv()
 showevent(b)
 
-# wait for at least a report
-b = p1.recv()
-showevent(b)
-
 p1.send(HCI_Hdr()/HCI_Command_Hdr()/HCI_Cmd_LE_Set_Scan_Enable(
             enable=False, filter_dups=True))
 b = p1.recv()
@@ -86,35 +84,64 @@ p1.send(HCI_Hdr()/HCI_Command_Hdr()/ HCI_Cmd_Write_Inquiry_Mode())
 b = p1.recv()
 showevent(b)
 
-# inquiry
-p1.send(HCI_Hdr()/HCI_Command_Hdr()/ HCI_Cmd_Inquiry())
-b = p1.recv()
-showevent(b)
 
+time.sleep(1)
 #p1.send(HCI_Hdr()/HCI_Command_Hdr()/HCI_Create_Connection(bd_addr="80:a5:89:12:fd:92"))
 #b = p1.recv()
 #showevent(b)
 
-p1.sendcmd(HCI_Cmd_Write_Page_Timeout() )
-b = p1.recv()
-showevent(b)
+#p1.sendcmd(HCI_Cmd_Write_Page_Timeout() )
+#b = p1.recv()
+#showevent(b)
 
-# HCI_Cmd_Authentication_Requested
-p1.sendcmd(HCI_Cmd_Authentication_Requested(handle = 0x43) )
-# <- Event: Link Key Request
-# HCI_Cmd_Link_Key_Request_Negative_Reply
-# <- Event: HCI IO Capability Request
-# HCI_Cmd_IO_Capability_Response
-# <- Event: HCI User Confirmation Request
-# HCI_Cmd_User_Confirmation_Request_Reply
-# <- Event: HCI Simple Pairing Complete
-     
-
+handle = 0
 bd_addr="F4:31:C3:53:D0:AB"
 bd_addr="20:54:76:99:4d:2d" # sony
+bd_addr="00:18:60:f9:50:7a" # acer
 p1.sendcmd(HCI_Cmd_Create_Connection(bd_addr = bd_addr))
 b = p1.recv()
 showevent(b)
+try:
+   while b != None:
+       if hasattr(b, "handle"):
+           handle = b.handle
+           break
+       else:
+           b = p1.recv()
+           showevent(b)
+except:
+   pass
+
+if handle != 0:   
+    print( "handle is {}".format(handle) )
+    # HCI_Cmd_Authentication_Requested
+    p1.sendcmd(HCI_Cmd_Authentication_Requested(handle = handle) )
+    # <- Event: Link Key Request
+    b = p1.recv()
+    showevent(b)
+
+    # HCI_Cmd_Link_Key_Request_Negative_Reply
+    p1.sendcmd(HCI_Cmd_Link_Key_Request_Negative_Reply(bd_addr = bd_addr) )
+    # <- Event: HCI IO Capability Request
+    b = p1.recv()
+    showevent(b)
+
+    # HCI_Cmd_IO_Capability_Request_Reply
+    p1.sendcmd(HCI_Cmd_IO_Capability_Request_Reply(bd_addr = bd_addr, io_capability=1) )
+    # <- Event: HCI User Confirmation Request
+    b = p1.recv()
+    showevent(b)
+
+    # HCI_Cmd_User_Confirmation_Request_Reply
+    p1.sendcmd(HCI_Cmd_User_Confirmation_Request_Reply(bd_addr = bd_addr) )
+    # <- Event: HCI Simple Pairing Complete
+    b = p1.recv()
+    showevent(b)
+
+    # inquiry
+    p1.send(HCI_Hdr()/HCI_Command_Hdr()/ HCI_Cmd_Inquiry())
+    b = p1.recv()
+    showevent(b)
 
 # iphone "F4:31:C3:53:D0:AB"
 # modify scapy.layers.bluetooth

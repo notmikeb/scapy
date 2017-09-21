@@ -224,41 +224,80 @@ class HCI_Event_Role_Change(Packet):
 class HCI_Cmd_Write_Page_Timeout(Packet):
     name = "HCI_Write_Page_Timeout"
     fields_desc = [
-    LEShortField("page_timeout", 10),
+    LEShortField("page_timeout", 50),
      ]
-     
+    
 # HCI_Read_Scan_Enable 0x19 , page 928
 class HCI_Cmd_Read_Scan_Enable(Packet):
     name = "HCI_Read_Scan_Enable"
     fields_desc = [
      ]
-
 # HCI_Write_Scan_Enable 0x1a page 929     
 class HCI_Cmd_Write_Scan_Enable(Packet):
     name = "HCI_Write_Scan_Enable"
     fields_desc = [
     ByteField("scan_enable", 0),
      ]
-
 # HCI_Read_Page_Scan_Activity 0x1b     
 class HCI_Cmd_Read_Page_Scan_Activity(Packet):
     name = "HCI_Read_Page_Scan_Activity"
     fields_desc = [
      ]     
-
-# HCI_Write_Page_Scan_Activity 0x001c
+# HCI_Write_Page_Scan_Activity 0x1c
 class HCI_Cmd_Write_Page_Scan_Activity(Packet):
     name = "HCI_Write_Page_Scan_Activity"
     fields_desc = [
     LEShortField("page_scan_interval", 0),
     LEShortField("page_scan_window", 0),
-     ]     
-
-# HCI_Cmd_Authentication_Requested
-# HCI_Cmd_Link_Key_Request_Negative_Reply
-# HCI_Cmd_IO_Capability_Response
-# HCI_Cmd_User_Confirmation_Request_Reply
-
+     ]
+     
+# HCI_Setup_Synchronous_Connection, 0x28 , 7.1.26, page812
+class HCI_Cmd_Setup_Synchronous_Connection(Packet):
+    name = "HCI_Cmd_Setup_Synchronous_Connection"
+    fields_desc = [
+    LEShortField("handle",0x00),
+    StrFixedLenField("transmit_bandwidth", '\x00' * 4, 4),
+    StrFixedLenField("receive_bandwidth", '\x00' * 4, 4),
+    LEShortField("max_latency",0x00),
+    LEShortField("voice_setting",0x00),
+    ByteField("retransmission_effort",0),
+    LEShortField("packet_type",0x00),
+     ]
+# HCI_Accept_Synchronous_Connection_Request, 0x29, 7.1.27
+class HCI_Cmd_Accept_Synchronous_Connection_Request(Packet):
+    name = "HCI_Cmd_Accept_Synchronous_Connection_Request"
+    fields_desc = [
+    LEMACField("bd_addr", None),
+    StrFixedLenField("transmit_bandwidth", '\x00' * 4, 4),
+    StrFixedLenField("receive_bandwidth", '\x00' * 4, 4),
+    LEShortField("max_latency",0x00),
+    LEShortField("voice_setting",0x00),
+    ByteField("retransmission_effort",0),
+    LEShortField("packet_type",0x00),
+     ]
+# HCI_Reject_Synchronous_Connection_Request, 0x2a, 7.1.2a
+class HCI_Cmd_Reject_Synchronous_Connection_Request(Packet):
+    name = "HCI_Cmd_Reject_Synchronous_Connection_Request"
+    fields_desc = [
+    LEMACField("bd_addr", None),
+    ByteField("reason",0),
+     ]
+# HCI_IO_Capability_Request_Reply, 0x2b, 7.1.29
+class HCI_Cmd_IO_Capability_Request_Reply(Packet):
+    name = "HCI_Cmd_IO_Capability_Request_Reply"
+    fields_desc = [
+    LEMACField("bd_addr", None),
+    ByteField("io_capability",0),
+    ByteField("oob_data_present",0),
+    ByteField("authentication_requirements",1),
+     ]
+# HCI_User_Confirmation_Request_Reply, 0x2c, 7.1.30
+class HCI_Cmd_User_Confirmation_Request_Reply(Packet):
+    name = "HCI_Cmd_User_Confirmation_Request_Reply"
+    fields_desc = [
+    LEMACField("bd_addr", None),
+     ]
+     
 # <- Event: Link Key Request
 # <- Event: HCI IO Capability Request
 # <- Event: HCI User Confirmation Request
