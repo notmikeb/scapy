@@ -62,8 +62,8 @@ class HCI_Hdr(Packet):
     def mysummary(self):
         return self.sprintf("HCI %type%")
 
-## HCI Command
-class HCI_Inquiry(Packet):
+## HCI Command, 0x01, 7.1.1
+class HCI_Cmd_Inquiry(Packet):
     name = "HCI Inquiry"
     fields_desc = [
     ByteField("nap_1",0x33),
@@ -73,19 +73,40 @@ class HCI_Inquiry(Packet):
     ByteField("num_rsp",0)
     ]
 
-class HCI_Write_Inquiry_Mode(Packet):
+    
+# HCI_Authentication_Requested , 0x11, 7.1.15
+class HCI_Cmd_Authentication_Requested(Packet):
+    name = "HCI_Cmd_Authentication_Requested"
+    fields_desc = [
+    LEShortField("handle",0x00),
+    ]
+# HCI_Set_Connection_Encryption, 0x13, 7.1.16
+class HCI_Cmd_Set_Connection_Encryption(Packet):
+    name = "HCI_Cmd_Set_Connection_Encryption"
+    fields_desc = [
+    LEShortField("handle",0x00),
+    ByteField("encryption_enable",0x0),
+    ]
+# HCI_Change_Connection_Link_Key 0x15, 7.1.17
+class HCI_Cmd_Change_Connection_Link_Key(Packet):
+    name = "HCI_Change_Connection_Link_Key"
+    fields_desc = [
+    LEShortField("handle",0x00),
+    ]
+# HCI_Master_Link_Key, 0x17, 7.1.18
+class HCI_Cmd_Master_Link_Key(Packet):
+    name = "HCI_Master_Link_Key"
+    fields_desc = [
+    ByteField("key_flag",0x00),
+    ]
+
+class HCI_Cmd_Write_Inquiry_Mode(Packet):
     name = "HCI_Write_Inquiry_Mode"
     fields_desc = [
-    ByteField("inquiry_mode",0)
+        ByteField("inquiry_mode",0)
     ]
 
-class HCI_Write_Scan_Enable(Packet):
-    name = "HCI Write Scan Enable"
-    fields_desc = [
-    ByteField("enable",0)
-    ]
-
-class HCI_Remote_Name_Request(Packet):
+class HCI_Cmd_Remote_Name_Request(Packet):
     name = "HCI Remote Name Request"
     fields_desc = [
     LEMACField("address", None),
@@ -94,20 +115,20 @@ class HCI_Remote_Name_Request(Packet):
     LEShortField("clock_offset",0)
     ]
 
-class HCI_Remote_Name_Request_Cancel(Packet):
+class HCI_Cmd_Remote_Name_Request_Cancel(Packet):
     name = "HCI Remote Name Request Cancel"
     fields_desc = [
     LEMACField("address", None),
     ]
 
-class HCI_Read_Remote_Supported_Features(Packet):
+class HCI_Cmd_Read_Remote_Supported_Features(Packet):
     name = "HCI Remote Suported Features"
     fields_desc = [
         ByteField("handle",0), # Actually, handle is 12 bits and flags is 4.
         ByteField("flags",0),  # I wait to write a LEBitField
     ]
 
-class HCI_Read_Remote_Extended_Features(Packet) :
+class HCI_Cmd_Read_Remote_Extended_Features(Packet) :
     name = "HCI Remote Extended Features"
     fields_desc = [
         ByteField("handle",0), # Actually, handle is 12 bits and flags is 4.
@@ -115,8 +136,8 @@ class HCI_Read_Remote_Extended_Features(Packet) :
         ByteField("page_number",0),
     ]
     
-# HCI_Create_Connection 0x0005    
-class HCI_Create_Connection(Packet):
+# HCI_Create_Connection 0x05    
+class HCI_Cmd_Create_Connection(Packet):
     name = "HCI_Create_Connection"
     fields_desc = [
     LEMACField("bd_addr", None),
@@ -126,34 +147,69 @@ class HCI_Create_Connection(Packet):
     LEShortField("clock_offset",0),
     ByteField("allow_role_switch",1),
     ]
-# HCI_Disconnect 0x0006
-class HCI_Disconnect(Packet):
+# HCI_Disconnect 0x06
+class HCI_Cmd_Disconnect(Packet):
     name = "HCI_Disconnect"
     fields_desc = [
     ByteField("handle",0), # Actually, handle is 12 bits and flags is 4.
     ByteField("flags",0),  # I wait to write a LEBitField    
     ByteField("reason",0),
     ]    
-# HCI_Create_Connection_Cancel 0x008
-class HCI_Create_Connection_Cancel(Packet):
+# HCI_Create_Connection_Cancel 0x08
+class HCI_Cmd_Create_Connection_Cancel(Packet):
     name = "HCI_Create_Connection_Cancel"
     fields_desc = [
     LEMACField("bd_addr", None),
     ]    
-# HCI_Accept_Connection_Request 0x0009
-class HCI_Accept_Connection_Request(Packet):
+# HCI_Accept_Connection_Request 0x09
+class HCI_Cmd_Accept_Connection_Request(Packet):
     name = "HCI_Accept_Connection_Request"
     fields_desc = [
     LEMACField("bd_addr", None),
     ByteField("role",0),
     ]    
-# HCI_Reject_Connection_Request 0x000a
-class HCI_Reject_Connection_Request(Packet):
+# HCI_Reject_Connection_Request 0x0a
+class HCI_Cmd_Reject_Connection_Request(Packet):
     name = "HCI_Reject_Connection_Request"
     fields_desc = [
     LEMACField("bd_addr", None),
-    ByteField("role",0),
+    StrFixedLenField("link_key", '\x00' * 16, 16)
     ]
+
+# HCI_Link_Key_Request_Reply , 0x0b, 7.1.10
+class HCI_Cmd_Link_Key_Request_Reply(Packet):
+    name = "HCI_Cmd_Link_Key_Request_Reply"
+    fields_desc = [
+    LEMACField("bd_addr", None),
+    StrFixedLenField("link_key", '\x00' * 16, 16)
+    ]
+# HCI_Link_Key_Request_Negative_Reply, 0x0c, 7.1.11
+class HCI_Cmd_Link_Key_Request_Negative_Reply(Packet):
+    name = "HCI_Link_Key_Request_Negative_Reply"
+    fields_desc = [
+    LEMACField("bd_addr", None),
+    ]
+# HCI_PIN_Code_Request_Reply 0x0d, 7.1.12
+class HCI_Cmd_PIN_Code_Request_Reply(Packet):
+    name = "HCI_Cmd_PIN_Code_Request_Reply"
+    fields_desc = [
+    LEMACField("bd_addr", None),
+    ByteField("pin_code_length",0),
+    StrFixedLenField("pin_code", '\x00' * 16, 16)
+    ]
+# HCI_PIN_Code_Request_Negative_Reply, 0x0e, 7.1.13
+class HCI_Cmd_PIN_Code_Request_Negative_Reply(Packet):
+    name = "HCI_PIN_Code_Request_Negative_Reply"
+    fields_desc = [
+        LEMACField("bd_addr", None),
+    ]
+# HCI_Change_Connection_Packet_Type, 0x0f, 7.1.14
+class HCI_Cmd_HCI_Change_Connection_Packet_Type(Packet):
+    name = "HCI_Cmd_HCI_Change_Connection_Packet_Type"
+    fields_desc = [
+        LEShortField("handle",0x00),
+        LEShortField("packet_type",0x00),
+    ]    
     
 # HCI_Event_Role_Change, 0x12, page 1127
 class HCI_Event_Role_Change(Packet):
@@ -163,7 +219,52 @@ class HCI_Event_Role_Change(Packet):
     LEMACField("bd_addr", None),
     ByteField("role",0),
     ]
-    
+
+# HCI_Write_Page_Timeout 0x18 page 927
+class HCI_Cmd_Write_Page_Timeout(Packet):
+    name = "HCI_Write_Page_Timeout"
+    fields_desc = [
+    LEShortField("page_timeout", 10),
+     ]
+     
+# HCI_Read_Scan_Enable 0x19 , page 928
+class HCI_Cmd_Read_Scan_Enable(Packet):
+    name = "HCI_Read_Scan_Enable"
+    fields_desc = [
+     ]
+
+# HCI_Write_Scan_Enable 0x1a page 929     
+class HCI_Cmd_Write_Scan_Enable(Packet):
+    name = "HCI_Write_Scan_Enable"
+    fields_desc = [
+    ByteField("scan_enable", 0),
+     ]
+
+# HCI_Read_Page_Scan_Activity 0x1b     
+class HCI_Cmd_Read_Page_Scan_Activity(Packet):
+    name = "HCI_Read_Page_Scan_Activity"
+    fields_desc = [
+     ]     
+
+# HCI_Write_Page_Scan_Activity 0x001c
+class HCI_Cmd_Write_Page_Scan_Activity(Packet):
+    name = "HCI_Write_Page_Scan_Activity"
+    fields_desc = [
+    LEShortField("page_scan_interval", 0),
+    LEShortField("page_scan_window", 0),
+     ]     
+
+# HCI_Cmd_Authentication_Requested
+# HCI_Cmd_Link_Key_Request_Negative_Reply
+# HCI_Cmd_IO_Capability_Response
+# HCI_Cmd_User_Confirmation_Request_Reply
+
+# <- Event: Link Key Request
+# <- Event: HCI IO Capability Request
+# <- Event: HCI User Confirmation Request
+# <- Event: HCI Simple Pairing Complete
+     
+     
 class HCI_ACL_Hdr(Packet):
     name = "HCI ACL header"
     fields_desc = [ ByteField("handle",0), # Actually, handle is 12 bits and flags is 4.
@@ -829,8 +930,14 @@ bind_layers( HCI_Hdr,       conf.raw_layer,           )
 bind_layers( HCI_Command_Hdr, HCI_Cmd_Reset, opcode=0x0c03)
 bind_layers( HCI_Command_Hdr, HCI_Cmd_Set_Event_Mask, opcode=0x0c01)
 bind_layers( HCI_Command_Hdr, HCI_Cmd_Set_Event_Filter, opcode=0x0c05)
+
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Write_Page_Timeout, opcode=0x0c18)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Read_Scan_Enable, opcode=0x0c19)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Write_Scan_Enable, opcode=0x0c1a)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Read_Page_Scan_Activity, opcode=0x0c1b)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Write_Page_Scan_Activity, opcode=0x0c1c)
+
 bind_layers( HCI_Command_Hdr, HCI_Cmd_Connect_Accept_Timeout, opcode=0x0c16)
-bind_layers( HCI_Command_Hdr, HCI_Write_Scan_Enable, opcode=0x0c1a)
 
 
 bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Host_Supported, opcode=0x0c6d)
@@ -843,19 +950,29 @@ bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Set_Advertise_Enable, opcode=0x200a)
 bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Set_Scan_Parameters, opcode=0x200b)
 bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Set_Scan_Enable, opcode=0x200c)
 
-bind_layers( HCI_Command_Hdr, HCI_Inquiry, opcode=0x0401)
-bind_layers( HCI_Command_Hdr, HCI_Create_Connection, opcode=0x0405)
-bind_layers( HCI_Command_Hdr, HCI_Disconnect, opcode=0x0406)
-bind_layers( HCI_Command_Hdr, HCI_Create_Connection_Cancel, opcode=0x0408)
-bind_layers( HCI_Command_Hdr, HCI_Accept_Connection_Request, opcode=0x0409)
-bind_layers( HCI_Command_Hdr, HCI_Reject_Connection_Request, opcode=0x040a)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Inquiry, opcode=0x0401)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Create_Connection, opcode=0x0405)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Disconnect, opcode=0x0406)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Create_Connection_Cancel, opcode=0x0408)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Accept_Connection_Request, opcode=0x0409)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Reject_Connection_Request, opcode=0x040a)
 
-bind_layers( HCI_Command_Hdr, HCI_Remote_Name_Request, opcode=0x0419)
-bind_layers( HCI_Command_Hdr, HCI_Remote_Name_Request_Cancel, opcode=0x041A)
-bind_layers( HCI_Command_Hdr, HCI_Read_Remote_Supported_Features, opcode=0x041B)
-bind_layers( HCI_Command_Hdr, HCI_Read_Remote_Extended_Features, opcode=0x041C)
-bind_layers( HCI_Command_Hdr, HCI_Write_Inquiry_Mode, opcode=0x0c45)
-bind_layers( HCI_Command_Hdr, HCI_Cmd_Disconnect, opcode=0x406)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Link_Key_Request_Reply, opcode=0x040b)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Link_Key_Request_Negative_Reply, opcode=0x040c)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_PIN_Code_Request_Reply, opcode=0x040d)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_PIN_Code_Request_Negative_Reply, opcode=0x040e)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_HCI_Change_Connection_Packet_Type, opcode=0x040f)
+
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Authentication_Requested, opcode=0x0411)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Set_Connection_Encryption, opcode=0x0413)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Change_Connection_Link_Key, opcode=0x0415)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Master_Link_Key, opcode=0x0417)
+
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Remote_Name_Request, opcode=0x0419)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Remote_Name_Request_Cancel, opcode=0x041A)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Read_Remote_Supported_Features, opcode=0x041B)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Read_Remote_Extended_Features, opcode=0x041C)
+bind_layers( HCI_Command_Hdr, HCI_Cmd_Write_Inquiry_Mode, opcode=0x0c45)
 
 bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Create_Connection, opcode=0x200d)
 bind_layers( HCI_Command_Hdr, HCI_Cmd_LE_Create_Connection_Cancel, opcode=0x200e)

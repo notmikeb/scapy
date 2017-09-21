@@ -78,24 +78,41 @@ b = p1.recv()
 showevent(b)
 
 # enable
-p1.send(HCI_Hdr()/HCI_Command_Hdr()/ HCI_Write_Scan_Enable(enable=1))
+p1.send(HCI_Hdr()/HCI_Command_Hdr()/ HCI_Cmd_Write_Scan_Enable(scan_enable=1))
 b = p1.recv()
 showevent(b)
 
-p1.send(HCI_Hdr()/HCI_Command_Hdr()/ HCI_Write_Inquiry_Mode())
+p1.send(HCI_Hdr()/HCI_Command_Hdr()/ HCI_Cmd_Write_Inquiry_Mode())
 b = p1.recv()
 showevent(b)
 
 # inquiry
-p1.send(HCI_Hdr()/HCI_Command_Hdr()/ HCI_Inquiry())
+p1.send(HCI_Hdr()/HCI_Command_Hdr()/ HCI_Cmd_Inquiry())
 b = p1.recv()
 showevent(b)
 
-p1.send(HCI_Hdr()/HCI_Command_Hdr()/HCI_Create_Connection(bd_addr="80:a5:89:12:fd:92"))
+#p1.send(HCI_Hdr()/HCI_Command_Hdr()/HCI_Create_Connection(bd_addr="80:a5:89:12:fd:92"))
+#b = p1.recv()
+#showevent(b)
+
+p1.sendcmd(HCI_Cmd_Write_Page_Timeout() )
 b = p1.recv()
 showevent(b)
 
-p1.sendcmd(HCI_Create_Connection(bd_addr="F4:31:C3:53:D0:AB"))
+# HCI_Cmd_Authentication_Requested
+p1.sendcmd(HCI_Cmd_Authentication_Requested(handle = 0x43) )
+# <- Event: Link Key Request
+# HCI_Cmd_Link_Key_Request_Negative_Reply
+# <- Event: HCI IO Capability Request
+# HCI_Cmd_IO_Capability_Response
+# <- Event: HCI User Confirmation Request
+# HCI_Cmd_User_Confirmation_Request_Reply
+# <- Event: HCI Simple Pairing Complete
+     
+
+bd_addr="F4:31:C3:53:D0:AB"
+bd_addr="20:54:76:99:4d:2d" # sony
+p1.sendcmd(HCI_Cmd_Create_Connection(bd_addr = bd_addr))
 b = p1.recv()
 showevent(b)
 
