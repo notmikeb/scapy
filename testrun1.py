@@ -116,7 +116,7 @@ if handle != 0:
     print( "handle is {}".format(handle) )
     # HCI_Cmd_Authentication_Requested
     p1.sendcmd(HCI_Cmd_Authentication_Requested(handle = handle) )
-    # <- Event: Link Key Request
+    # <- Event: Link Key Request 0x1b
     b = p1.recv()
     showevent(b)
 
@@ -137,11 +137,14 @@ if handle != 0:
     # <- Event: HCI Simple Pairing Complete
     b = p1.recv()
     showevent(b)
+    
+    p1.sendcmd( HCI_Cmd_PIN_Code_Request_Reply(bd_addr = bd_addr, pin_code_length=4, pin_code = '0000') )
+    b = p1.recv();b
 
     # inquiry
-    p1.send(HCI_Hdr()/HCI_Command_Hdr()/ HCI_Cmd_Inquiry())
-    b = p1.recv()
-    showevent(b)
+    #p1.send(HCI_Hdr()/HCI_Command_Hdr()/ HCI_Cmd_Inquiry())
+    #b = p1.recv()
+    #showevent(b)
 
 # iphone "F4:31:C3:53:D0:AB"
 # modify scapy.layers.bluetooth

@@ -298,12 +298,6 @@ class HCI_Cmd_User_Confirmation_Request_Reply(Packet):
     LEMACField("bd_addr", None),
      ]
      
-# <- Event: Link Key Request
-# <- Event: HCI IO Capability Request
-# <- Event: HCI User Confirmation Request
-# <- Event: HCI Simple Pairing Complete
-     
-     
 class HCI_ACL_Hdr(Packet):
     name = "HCI ACL header"
     fields_desc = [ ByteField("handle",0), # Actually, handle is 12 bits and flags is 4.
@@ -906,17 +900,131 @@ class HCI_Cmd_Complete_Read_BD_Addr(Packet):
     name = "Read BD Addr"
     fields_desc = [ LEMACField("addr", None), ]
 
-
-
 class HCI_Event_Command_Status(Packet):
     name = "Command Status"
     fields_desc = [ ByteEnumField("status", 0, {0:"pending"}),
                     ByteField("number", 0),
                     XLEShortField("opcode", None), ]
 
+# HCI_Event_Authentication_Complete, 0x06, 7.7.6, page 1111
+class HCI_Event_Authentication_Complete(Packet):
+    name = "HCI_Event_Authentication_Complete"
+    fields_desc = [ 
+    ByteField("status", 0),
+    XLEShortField("connection_handle", 0),
+    ]
+
+# HCI_Event_Remote_Name_Request_Complete, 0x07, 7.7.7, page 1112
+class HCI_Event_Remote_Name_Request_Complete(Packet):
+    name = "HCI_Event_Remote_Name_Request_Complete"
+    fields_desc = [ 
+    ByteField("status", 0),
+    LEMACField("addr", None),
+    StrFixedLenField("remote_name", '\x00' * 248, 248),    
+    ]
+# HCI_Event_Change_Connection_Link_Key_Complete, 0x09, 7.7.9, page 1115
+class HCI_Event_Change_Connection_Link_Key_Complete(Packet):
+    name = "HCI_Event_Change_Connection_Link_Key_Complete"
+    fields_desc = [ 
+    ByteField("status", 0),
+    XLEShortField("connection_handle", 0),
+    ]
+# HCI_Event_Master_Link_Key_Complete, 0x0a, 7.7.10, page 1116
+class HCI_Event_Master_Link_Key_Complete(Packet):
+    name = "HCI_Event_Master_Link_Key_Complete"
+    fields_desc = [ 
+    ByteField("status", 0),
+    XLEShortField("connection_handle", 0),
+    ByteField("key_flag", 0),
+    ]
+
+# HCI_Event_Flush_Occurred, 0x11, 7.7.17, page 1126
+class HCI_Event_Flush_Occurred(Packet):
+    name = "HCI_Event_Flush_Occurred"
+    fields_desc = [ 
+    XLEShortField("handle", 0),
+    ]
+
+# HCI_Event_Role_Change, 0x12, 7.7.18, page 1127
+class HCI_Event_Role_Change(Packet):
+    name = "HCI_Event_Role_Change"
+    fields_desc = [ 
+    ByteField("status", 0),
+    LEMACField("bd_addr", None),
+    ByteField("new_role", 0),
+    ]
+
+# HCI_Event_Number_Of_Completed_Packets, 0x13, 7.7.19, page 1128
 class HCI_Event_Number_Of_Completed_Packets(Packet):
-    name = "Number Of Completed Packets"
-    fields_desc = [ ByteField("number", 0) ]
+    name = "HCI_Event_Number_Of_Completed_Packets"
+    fields_desc = [ 
+    ByteField("number_of_handles", 0),
+    XLEShortField("connection_handle", 0),
+    XLEShortField("hc_num_of_completed_packets", 0),
+    ]
+    
+# HCI_Event_PIN_Code_Request , 0x16, 7.7.22, page 1133
+class HCI_Event_PIN_Code_Request(Packet):
+    name = "HCI_Event_PIN_Code_Request"
+    fields_desc = [ 
+    LEMACField("bd_addr", None),
+    ]
+    
+# HCI Event Link Key Request , 0x17, 7.7.23 page 1134
+class HCI_Event_Link_Key_Request(Packet):
+    name = "HCI_Event_Link_Key_Request"
+    fields_desc = [ 
+    LEMACField("bd_addr", None),
+    ]
+# HCI_Event_Link_Key_Notification, 0x18, 7.7.25, page 1135
+class HCI_Event_Link_Key_Notification(Packet):
+    name = "HCI_Event_Link_Key_Notification"
+    fields_desc = [ 
+    LEMACField("bd_addr", None),
+    StrFixedLenField("link_key", '\x00' * 16, 16),
+    ByteField("link_type", 0),
+    ]
+
+# HCI_Event_Loopback_Command, 0x19, 7.7.25, page 1137
+class HCI_Event_Loopback_Command(Packet):
+    name = "HCI_Event_Loopback_Command"
+    fields_desc = [ 
+    StrFixedLenField("link_key", '\x00' * 16, 16), # todo unknown length
+    ]
+
+# HCI_Event_Max_Slots_Change, 0x1b, 7.7.27, page 1139
+class HCI_Event_Max_Slots_Change(Packet):
+    name = "HCI_Event_Max_Slots_Change"
+    fields_desc = [ 
+    XLEShortField("connection_handle", 0),
+    ByteField("lmp_max_slots", 0),
+    ]
+
+# HCI_Event_IO_Capability_Request, 0x31, 7.7.40, page 1161
+class HCI_Event_IO_Capability_Request(Packet):
+    name = "HCI_Event_IO_Capability_Request"
+    fields_desc = [ 
+    LEMACField("bd_addr", None),
+    ]
+# HCI_Event_User_Confirmation_Request, 0x33, 7.7.42, page 1164
+class HCI_Event_User_Confirmation_Request(Packet):
+    name = "HCI_Event_User_Confirmation_Request"
+    fields_desc = [ 
+    LEMACField("paddr", None),
+    StrFixedLenField("numberic_value", '\x00' * 4, 4),
+    ]
+# HCI_Event_Simple_Pairing_Complete, 0x36, 7.7.45, page 1167
+class HCI_Event_Simple_Pairing_Complete(Packet):
+    name = "HCI_Event_Simple_Pairing_Complete"
+    fields_desc = [ 
+    ByteField("status", 0),
+    LEMACField("bd_addr", None),
+    ]
+
+                    
+#class HCI_Event_Number_Of_Completed_Packets(Packet):
+#    name = "Number Of Completed Packets"
+#    fields_desc = [ ByteField("number", 0) ]
 
 class HCI_Event_LE_Meta(Packet):
     name = "LE Meta"
@@ -1026,12 +1134,27 @@ bind_layers( HCI_Event_Hdr, HCI_Event_Inquiry_Complete, code=0x1)
 bind_layers( HCI_Event_Hdr, HCI_Event_Inquiry_Result, code=0x2)
 bind_layers( HCI_Event_Hdr, HCI_Event_Connection_Complete, code=0x3)
 bind_layers( HCI_Event_Hdr, HCI_Event_Connection_Request_Event, code=0x4)
-bind_layers( HCI_Event_Hdr, HCI_Event_Role_Change, code = 0x12)
 bind_layers( HCI_Event_Hdr, HCI_Event_Disconnection_Complete, code=0x5)
+bind_layers( HCI_Event_Hdr, HCI_Event_Authentication_Complete, code=0x6)
+bind_layers( HCI_Event_Hdr, HCI_Event_Remote_Name_Request_Complete, code=0x7)
 bind_layers( HCI_Event_Hdr, HCI_Event_Encryption_Change, code=0x8)
+bind_layers( HCI_Event_Hdr, HCI_Event_Change_Connection_Link_Key_Complete, code=0x9)
+bind_layers( HCI_Event_Hdr, HCI_Event_Master_Link_Key_Complete, code=0xa)
 bind_layers( HCI_Event_Hdr, HCI_Event_Command_Complete, code=0xe)
 bind_layers( HCI_Event_Hdr, HCI_Event_Command_Status, code=0xf)
+bind_layers( HCI_Event_Hdr, HCI_Event_Flush_Occurred, code=0x11)
+bind_layers( HCI_Event_Hdr, HCI_Event_Role_Change, code=0x12)
 bind_layers( HCI_Event_Hdr, HCI_Event_Number_Of_Completed_Packets, code=0x13)
+
+
+bind_layers( HCI_Event_Hdr, HCI_Event_PIN_Code_Request, code=0x16)
+bind_layers( HCI_Event_Hdr, HCI_Event_Link_Key_Request, code=0x17)
+bind_layers( HCI_Event_Hdr, HCI_Event_Link_Key_Notification, code=0x18)
+bind_layers( HCI_Event_Hdr, HCI_Event_Loopback_Command, code=0x19)
+bind_layers( HCI_Event_Hdr, HCI_Event_Max_Slots_Change, code=0x1b)
+bind_layers( HCI_Event_Hdr, HCI_Event_IO_Capability_Request, code=0x31)
+bind_layers( HCI_Event_Hdr, HCI_Event_User_Confirmation_Request, code=0x33)
+bind_layers( HCI_Event_Hdr, HCI_Event_Simple_Pairing_Complete, code=0x36)
 bind_layers( HCI_Event_Hdr, HCI_Event_LE_Meta, code=0x3e)
 
 bind_layers( HCI_Event_Command_Complete, HCI_Cmd_Complete_Read_BD_Addr, opcode=0x1009)
